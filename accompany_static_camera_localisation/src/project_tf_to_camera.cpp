@@ -158,7 +158,7 @@ int main(int argc, char** argv)
   po::options_description optionsDescription
     ( "Project tf frames to the camera\n"
       "Example:\n"
-      "  project_tf_to_camera -s /left_hand_1 /right_hand1 -t /fisheye1/gscam/image_color -v\n"
+      "  project_tf_to_camera -f /left_hand_1 /right_hand1 -t /fisheye1/gscam/image_color -v\n"
       "  rosrun image_view image_view image:=/image_out\n"
       "Allowed options:");
   optionsDescription.add_options()
