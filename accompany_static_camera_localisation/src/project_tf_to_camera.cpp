@@ -115,8 +115,9 @@ public:
 
       tf::Point pt = transform.getOrigin();
       cv::Point3d pt_cv(pt.x(), pt.y(), pt.z());
-      cv::Point2d uv;
-      uv = cam_model_.project3dToPixel(pt_cv);
+      cv::Point2d uv_rect,uv;
+      uv_rect = cam_model_.project3dToPixel(pt_cv);
+      uv = cam_model_.unrectifyPoint(uv_rect); // compute unrectified points
       ROS_INFO("%0.2f,%0.2f,%0.2f -> %0.2f,%0.2f", pt.x(), pt.y(), pt.z(), uv.x, uv.y);
 
       if (save_on)
@@ -139,7 +140,7 @@ public:
       cv::Mat pts_mat(pts);
       cv::Mat pts_tmat = pts_mat.t();
       col_vals.push_back(pts_tmat.clone());
-      timestamp.push_back(acquisition_time.toSec());
+      timestamp.push_back(info_msg->header.stamp.toSec());
       writeData(frame_ids_, col_vals, timestamp);
     }
 
