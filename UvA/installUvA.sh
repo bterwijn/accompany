@@ -18,7 +18,6 @@ git clone git://basterwijn.nl/home/bterwijn/git/accompany.git
 cd ~
 mkdir -p programs
 
-
 # cmnGwenn
 cd ~/programs
 git clone git://basterwijn.nl/home/bterwijn/git/cmnGwenn.git
@@ -91,6 +90,16 @@ rosmake cob_people_perception
 rosdep install gscam
 rosmake gscam
 
+# map server
+sudo apt-get install ros-electric-navigation
+rosdep install navigation
+rosmake navigation
+
+# rviz
+sudo apt-get install ros-electric-viz
+rosdep install rviz
+rosmake rviz
+
 # accompany
 rosdep install accompany_uva
 rosmake accompany_uva
@@ -100,5 +109,9 @@ rosmake accompany_uva
 roscd accompany_uva/scripts
 ./startTestRobotHouse.sh
 
-# tracks humans and identities using artificial data
-roslaunch accompany_human_tracker testTracker.launch
+# view images
+roslaunch accompany_uva trackRobotHouseViewImages.launch
+
+# rviz
+rosrun rviz rviz
+# add tf,map,markerArray to display
