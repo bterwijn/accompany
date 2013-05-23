@@ -18,7 +18,7 @@ wget -nc http://basterwijn.nl/bterwijn/Accompany/RobotHouse/camera1/2012-09-25-1
 #wget -nc http://basterwijn.nl/bterwijn/Accompany/RobotHouse/camera1/res/params.xml
 #wget -nc http://basterwijn.nl/bterwijn/Accompany/RobotHouse/camera1/res/prior.txt
 ln -sf ./2012-09-25-11-59-11.bag video.bag
-python ../../../scripts/retopicBag.py video.bag retopic.bag /camera1
+rosrun accompany_uva retopicBag.py video.bag retopic.bag /camera1
 cd ../
 
 #mkdir -p camera2
@@ -43,7 +43,7 @@ wget -nc http://basterwijn.nl/bterwijn/Accompany/RobotHouse/camera3/2012-09-25-1
 #wget -nc http://basterwijn.nl/bterwijn/Accompany/RobotHouse/camera3/res/params.xml
 #wget -nc http://basterwijn.nl/bterwijn/Accompany/RobotHouse/camera3/res/prior.txt
 ln -sf ./2012-09-25-11-59-13.bag video.bag
-python ../../../scripts/retopicBag.py video.bag retopic.bag /camera3
+rosrun accompany_uva retopicBag.py video.bag retopic.bag /camera3
 cd ../
 
 mkdir -p cameras
