@@ -1,22 +1,42 @@
 
 
-sudo ls
+# install Ubuntu11.10 (64bit), update all packages, reboot
 
-sudo apt-get -y install aptitude emacs git gitk mercurial libopencv2.3-dev cmake libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev gstreamer-tools gstreamer0.10-x gtk2-engines-pixbuf ros-electric-openni-kinect
+#dirs
+mkdir -p ~/programs
+mkdir -p ~/ros
 
+# init 
+sudo apt-get -y install aptitude git emacs gitk mercurial libopencv2.3-dev cmake libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev gstreamer-tools gstreamer0.10-x gtk2-engines-pixbuf ros-electric-openni-kinect
+cd ~/ros
+git clone git://basterwijn.nl/home/bterwijn/git/accompany.git
 cd
-mkdir -p ros
+
+# ros
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu oneiric main" > /etc/apt/sources.list.d/ros-latest.list'
+wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
+sudo apt-get update
+sudo apt-get -y install ros-electric-desktop-full
+echo "" >> ~/.bashrc
+echo "# ROS" >> ~/.bashrc
+echo "source /opt/ros/electric/setup.bash" >> ~/.bashrc
+echo "export ROS_WORKSPACE=~/ros" >> ~/.bashrc
+echo "export ROS_PACKAGE_PATH=\$ROS_WORKSPACE:\$ROS_PACKAGE_PATH" >> ~/.bashrc
+. ~/.bashrc
+source /opt/ros/electric/setup.bash
 export ROS_WORKSPACE=~/ros
 export ROS_PACKAGE_PATH=$ROS_WORKSPACE:$ROS_PACKAGE_PATH
-echo "export ROS_WORKSPACE=~/ros" >> ~/.bashrc
-echo "export ROS_PACKAGE_PATH=$ROS_WORKSPACE:$ROS_PACKAGE_PATH" >> ~/.bashrc
-cd ros
 
-# accompany
-git clone git://basterwijn.nl/home/bterwijn/git/accompany.git
-
-cd ~
-mkdir -p programs
+# vxl
+cd ~/programs
+wget http://downloads.sourceforge.net/project/vxl/vxl/1.17/vxl-1.17.0.zip
+unzip vxl-1.17.0.zip
+cd vxl-1.17.0/
+mkdir build
+cd build
+cmake .. -DBUILD_BRL=OFF
+make -j 4
+sudo make install
 
 # cmnGwenn
 cd ~/programs
@@ -91,27 +111,27 @@ rosdep install gscam
 rosmake gscam
 
 # map server
-sudo apt-get install ros-electric-navigation
+sudo apt-get -y install ros-electric-navigation
 rosdep install navigation
 rosmake navigation
 
 # rviz
-sudo apt-get install ros-electric-viz
+sudo apt-get -y install ros-electric-viz
 rosdep install rviz
 rosmake rviz
+
+# rospy
+#sudo apt-get -y install ros-electric-rospy
+rosdep install rospy
+rosmake rospy
+
+# rosbag
+#sudo apt-get -y install ros-electric-rosbag
+rosdep install rosbag
+rosmake rosbag
 
 # accompany
 rosdep install accompany_uva
 rosmake accompany_uva
 
-# Test
-# downloads prerecorded video and does detection and tracking
-roscd accompany_uva/scripts
-./startTestRobotHouse.sh
 
-# view images
-roslaunch accompany_uva trackRobotHouseViewImages.launch
-
-# rviz
-rosrun rviz rviz
-# add tf,map,markerArray to display
