@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-import roslib
-#import rospy
+
+import roslib; roslib.load_manifest('accompany_uva')
+import rospy
 import rosbag
 import sys
 
