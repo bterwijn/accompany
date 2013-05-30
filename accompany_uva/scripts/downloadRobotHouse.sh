@@ -11,6 +11,8 @@ wget -nc http://basterwijn.nl/bterwijn/Accompany/RobotHouse/map.yaml
 mkdir -p camera1
 cd camera1
 wget -nc http://basterwijn.nl/bterwijn/Accompany/RobotHouse/camera1/2012-09-25-11-59-11.bag
+wget -nc http://basterwijn.nl/bterwijn/Accompany/RobotHouse/camera1/background_images.zip
+unzip background_images.zip
 #wget -nc http://basterwijn.nl/bterwijn/Accompany/RobotHouse/camera1/res/bgmodel.xml
 #wget -nc http://basterwijn.nl/bterwijn/Accompany/RobotHouse/camera1/res/camera_extrinsic.xml
 #wget -nc http://basterwijn.nl/bterwijn/Accompany/RobotHouse/camera1/res/camera_intrinsic.xml
@@ -36,6 +38,8 @@ cd ../
 mkdir -p camera3
 cd camera3
 wget -nc http://basterwijn.nl/bterwijn/Accompany/RobotHouse/camera3/2012-09-25-11-59-13.bag
+wget -nc http://basterwijn.nl/bterwijn/Accompany/RobotHouse/camera3/background_images.zip
+unzip background_images.zip
 #wget -nc http://basterwijn.nl/bterwijn/Accompany/RobotHouse/camera3/res/bgmodel.xml
 #wget -nc http://basterwijn.nl/bterwijn/Accompany/RobotHouse/camera3/res/camera_extrinsic.xml
 #wget -nc http://basterwijn.nl/bterwijn/Accompany/RobotHouse/camera3/res/camera_intrinsic.xml
