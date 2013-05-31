@@ -7,7 +7,11 @@ mkdir -p ~/programs
 mkdir -p ~/ros
 
 # init 
-sudo apt-get -y install aptitude git emacs gitk mercurial libopencv2.3-dev cmake libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev gstreamer-tools gstreamer0.10-x gtk2-engines-pixbuf ros-electric-openni-kinect
+sudo apt-get -y install aptitude emacs git gitk mercurial libopencv2.3-dev cmake gtk2-engines-pixbuf 
+
+# gstreamer
+sudo apt-get -y install gstreamer-tools gstreamer0.10-plugins-base gstreamer0.10-plugins-good gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly gstreamer0.10-ffmpeg
+
 cd ~/ros
 git clone git://basterwijn.nl/home/bterwijn/git/accompany.git
 cd
