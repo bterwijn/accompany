@@ -41,7 +41,8 @@ void xml2yaml(std::string calib_xml, std::string& calib_yaml)
 
   boost::filesystem::path p(calib_xml);
   boost::filesystem::path dir = p.parent_path();
-  calib_yaml = dir.string() + "/camera_intrinsic.yaml";
+  // calib_yaml = dir.string() + "/camera_intrinsic.yaml";
+  calib_yaml = "camera_intrinsic.yaml";
 
   cv::FileStorage fs1(calib_xml, cv::FileStorage::READ);
   cv::FileStorage fs2(calib_yaml,cv::FileStorage::WRITE);
