@@ -10,7 +10,8 @@ using namespace std;
  * @param entryExitHulls the entry and exit areas of the scene
  * @param stateThreshold matching threshold on distance
  * @param appearanceThreshold matching threshold on appearance
- * @param totalThreshold combined threshold on distance and appearance 
+ * @param appearanceUpdate weight of new appearance vs old one
+ * @param maxSpeed the maximum speed of a track
  * @param minMatchCount the minimum number of matches before a track is published
  * @param maxUnmatchCount the maximum number of consecutive non-matches before a track might be removed 
  */
@@ -20,7 +21,8 @@ Tracker::Tracker(const ros::Publisher& trackedHumansPub,
                  const std::vector< std::vector<WorldPoint> >& entryExitHulls,
                  double stateThreshold,
                  double appearanceThreshold,
-                 double totalThreshold,
+                 double appearanceUpdate,
+                 double maxSpeed,
                  unsigned minMatchCount,
                  unsigned maxUnmatchCount)
 {
@@ -30,7 +32,8 @@ Tracker::Tracker(const ros::Publisher& trackedHumansPub,
   this->entryExitHulls=entryExitHulls;
   this->stateThreshold=stateThreshold;
   this->appearanceThreshold=appearanceThreshold;
-  this->totalThreshold=totalThreshold;
+  this->appearanceUpdate=appearanceUpdate;
+  this->maxSpeed=maxSpeed;
   this->minMatchCount=minMatchCount;
   this->maxUnmatchCount=maxUnmatchCount;
   // kalman motion and observation model
@@ -39,18 +42,19 @@ Tracker::Tracker(const ros::Publisher& trackedHumansPub,
                      0,0,1,0,
                      0,0,0,1};
   transModel=vnl_matrix<double>(tm,4,4);
-  const double tc[]={1,0,0,0,
-                     0,1,0,0,
-                     0,0,1,0,
-                     0,0,0,1};
+  const double tc[]={5,0,0,0,
+                     0,5,0,0,
+                     0,0,5,0,
+                     0,0,0,5};
   transCovariance=vnl_matrix<double>(tc,4,4);
   const double om[]={1,0,0,0,
                      0,1,0,0};
   obsModel=vnl_matrix<double>(om,2,4);
-  const double oc[]={1,0,
-                     0,1};
+  const double oc[]={10,0,
+                     0,10};
   obsCovariance=vnl_matrix<double>(oc,2,2);
   coordFrame="";// set coordinate frame of HumanDetections to unkown
+  trackerCount=0;
 }
 
 
@@ -103,7 +107,7 @@ void Tracker::processDetections(const accompany_uva_msg::HumanDetections::ConstP
       dataAssociation.set(i,j,match);
     }
 
-  vector<int> associations=dataAssociation.associate(totalThreshold);
+  vector<int> associations=dataAssociation.associate(stateThreshold+appearanceThreshold);
 
   // print associations
   /*
@@ -118,6 +122,7 @@ void Tracker::processDetections(const accompany_uva_msg::HumanDetections::ConstP
     tracks[i].addUnmatchCount();
 
   // update or create tracks
+  int assignedCount=0;
   for (unsigned i=0;i<associations.size();i++)
   {
     if (associations[i]<0) // not assigned
@@ -132,11 +137,15 @@ void Tracker::processDetections(const accompany_uva_msg::HumanDetections::ConstP
     }
     else // assigned
     {
+      assignedCount++;
       tracks[associations[i]].observation(humanDetections->detections[i],
+                                          appearanceUpdate,
                                           obsModel,
                                           obsCovariance);
+      tracks[associations[i]].maxSpeed(maxSpeed);
     }
   }
+  cout<<" trackerCount: "<<trackerCount<<" assignedCount: "<<assignedCount<<endl;
   
   removeTracks();
   reduceSpeed();
@@ -145,6 +154,7 @@ void Tracker::processDetections(const accompany_uva_msg::HumanDetections::ConstP
   prevTime=time;
   
   publishTracks();
+  trackerCount++;
 }
 
 /**
@@ -272,12 +282,20 @@ void Tracker::removeTracks()
         tracks.erase(it);
         remove=true;
       }
+      /*
       if (!inside(it->toWorldPoint(),priorHull)) // if not in priorHull
       {
         cout<<"remove track because unmatched="<<it->unmatchedCount<<" and is out of priorHull"<<endl;
         tracks.erase(it);
         remove=true;
       }
+      */
+    }
+    if (it->unmatchedCount>it->matchCount)
+    {
+      cout<<"remove track because unmatched="<<it->unmatchedCount<<" > matchCount"<<it->matchCount<<endl;
+      tracks.erase(it);
+      remove=true;
     }
     if (!remove) it++;
   }
@@ -317,10 +335,8 @@ std::ostream& operator<<(std::ostream& out,const Tracker& tracker)
 {
   out<<"Tracker ("<<tracker.tracks.size()<<"):"<<endl;
   out<<tracker.dataAssociation;
-  /*
   for (unsigned i=0;i<tracker.tracks.size();i++)
     out<<"["<<i<<"] "<<tracker.tracks[i];
   out<<endl;
-  */
   return out;
 }

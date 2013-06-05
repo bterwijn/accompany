@@ -63,18 +63,25 @@ double Track::match(const accompany_uva_msg::HumanDetection& humanDetection,
                     double appearanceThreshold)
 {
   double state=matchState(humanDetection,obsModel);
+  cout<<id<<" state-match-score: "<<state;
   if (state<stateThreshold)
-  {
-    cout<<"state="<<state<<" < stateThreshold="<<stateThreshold<<endl;
-    return -numeric_limits<double>::max();
-  }
+    cout<<" < stateThreshold="<<stateThreshold<<endl;
+  else
+    cout<<endl;
+
   double appearance=matchAppearance(humanDetection);
+  cout<<id<<" appearance-match-score: "<<appearance;
   if (appearance<appearanceThreshold)
-  {
-    cout<<"appearance="<<appearance<<" < appearanceThreshold="<<appearanceThreshold<<endl;
+    cout<<" < appearanceThreshold="<<appearanceThreshold<<endl;
+  else
+    cout<<endl;
+
+  if (state<stateThreshold)
     return -numeric_limits<double>::max();
-  }
+  if (appearance<appearanceThreshold)
+    return -numeric_limits<double>::max();
   return state+appearance;
+  //return appearance;
 }
 
 /**
@@ -124,11 +131,12 @@ double Track::matchAppearance(const accompany_uva_msg::HumanDetection& humanDete
 {
   unsigned dim=appearance.histogram.size();
   vnl_matrix<double> diff(dim,1);
-  double var=0.02;
+  double var=0.2;
   for (unsigned i=0;i<dim;i++)
     diff[i][0]=appearance.histogram[i]-humanDetection.appearance.histogram[i];
   vnl_matrix<double> exp=diff.transpose()*diff/var;
-  return -(DIMENSION*(log(2*M_PI) + log(var)) + exp[0][0])/2; // multivariate gaussian distribution
+  double match=-(DIMENSION*(log(2*M_PI) + log(var)) + exp[0][0])/2; // multivariate gaussian distribution
+  return match*20;
 }
 
 /**
@@ -150,6 +158,7 @@ void Track::transition(const vnl_matrix<double>& transModel,
  * @param obsCovariance kalman observation covariance
  */
 void Track::observation(const accompany_uva_msg::HumanDetection& humanDetection,
+                        const double appearanceUpdate,
                         const vnl_matrix<double>& obsModel,
                         const vnl_matrix<double>& obsCovariance)
 {
@@ -157,9 +166,25 @@ void Track::observation(const accompany_uva_msg::HumanDetection& humanDetection,
   kalmanFilter.observation(obs,
                            obsModel,
                            obsCovariance);
-  updateAppearance(0.1,humanDetection.appearance);
+  updateAppearance(appearanceUpdate,humanDetection.appearance);
   matchCount++;
   unmatchedCount=0;
+}
+
+/**
+ * Reduces the speed to maxSpeed
+ */
+void Track::maxSpeed(double maxSpeed)
+{
+  double dx=kalmanFilter.getState()[2];
+  double dy=kalmanFilter.getState()[3];
+  double speed=sqrt(dx*dx+dy*dy);
+  if (speed>maxSpeed)
+  {
+    double factor=maxSpeed/speed;
+    kalmanFilter.getState()[2]*=factor;
+    kalmanFilter.getState()[3]*=factor;
+  }
 }
 
 /**
@@ -196,14 +221,8 @@ void Track::reduceSpeed(double reduction)
  */
 void Track::updateAppearance(double weight,const accompany_uva_msg::Appearance& newAppearance)
 {
-  weight=1;
-  //cout<<*this<<endl;
-  double weight1=appearance.sumPixelWeights*(1-weight);
-  double weight2=newAppearance.sumPixelWeights*weight;
-  double sumPixelWeights=weight1+weight2;
-  weight1/=sumPixelWeights;
-  weight2/=sumPixelWeights;
-  
+  double weight1=(1-weight);
+  double weight2=weight;  
   for (unsigned i=0;i<appearance.histogram.size();i++)
   {
     appearance.histogram[i]=
@@ -211,11 +230,11 @@ void Track::updateAppearance(double weight,const accompany_uva_msg::Appearance& 
       newAppearance.histogram[i]*weight2;
   }
   appearance.sumPixelWeights=
-    appearance.sumPixelWeights*(1-weight)+
-    newAppearance.sumPixelWeights*weight;
+    appearance.sumPixelWeights*weight1+
+    newAppearance.sumPixelWeights*weight2;
   appearance.sumTemplatePixelSize=
-    appearance.sumTemplatePixelSize*(1-weight)+
-    newAppearance.sumTemplatePixelSize*weight;
+    appearance.sumTemplatePixelSize*weight1+
+    newAppearance.sumTemplatePixelSize*weight2;
 }
 
 /**
@@ -261,7 +280,7 @@ vnl_matrix<double> Track::getObsCovariance(const accompany_uva_msg::HumanDetecti
  */
 std::ostream& operator<<(std::ostream& out,const Track& track)
 {
-  out<<"Track:"<<endl;
+  out<<"Track: "<<track.id<<endl;
   out<<track.kalmanFilter;
   out<<"appearance:"<<endl;
   out<<"  sumTemplatePixelSize:"<<track.appearance.sumTemplatePixelSize<<endl;

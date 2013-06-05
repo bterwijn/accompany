@@ -31,9 +31,12 @@ class Track
   void transition(const vnl_matrix<double>& transModel,
                   const vnl_matrix<double>& transCovariance);
   void observation(const accompany_uva_msg::HumanDetection& humanDetection,
+                   const double appearanceUpdate,
                    const vnl_matrix<double>& obsModel,
                    const vnl_matrix<double>& obsCovariance);
   
+  void maxSpeed(double maxSpeed);
+
   void addUnmatchCount();
 
   WorldPoint toWorldPoint();

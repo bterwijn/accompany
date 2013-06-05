@@ -19,7 +19,7 @@ int main(int argc,char **argv)
   ros::init(argc, argv, "human_tracker");
 
   string param_path;
-  double stateThreshold,appearanceThreshold,totalThreshold;
+  double stateThreshold,appearanceThreshold,appearanceUpdate,maxSpeed;
 
   // handling command line arguments
   program_options::options_description optionsDescription("Tracks humans using human detections");
@@ -27,10 +27,10 @@ int main(int argc,char **argv)
     ("help,h","show help message")
     ("path,p", program_options::value<string>(&param_path)->required(),"path to pior.txt and entryExit.txt")
     ("stateThreshold,s",program_options::value<double>(&stateThreshold)->default_value(-6),"threshold on the kalman filter state")
-    ("appearanceThreshold,a",program_options::value<double>(&appearanceThreshold)->default_value(-0),"threshold on the appearance")
-    ("totalThreshold,t",program_options::value<double>(&totalThreshold)->default_value(-6),"combined threshold on state and appearance");
-
-program_options::variables_map variablesMap;
+    ("appearanceThreshold,a",program_options::value<double>(&appearanceThreshold)->default_value(-20),"threshold on the appearance")
+    ("appearanceUpdate,u",program_options::value<double>(&appearanceUpdate)->default_value(0.02),"weight of new appearance vs old one")
+    ("maxSpeed,m",program_options::value<double>(&maxSpeed)->default_value(4),"maximum speed of a track");
+  program_options::variables_map variablesMap;
   try
   {
     program_options::store(program_options::parse_command_line(argc, argv, optionsDescription),variablesMap);
@@ -62,7 +62,8 @@ program_options::variables_map variablesMap;
                   entryExitHulls,
                   stateThreshold,
                   appearanceThreshold,
-                  totalThreshold);
+                  appearanceUpdate,
+                  maxSpeed);
   
   // subscribers
   ros::Subscriber humanDetectionsSub=n.subscribe<accompany_uva_msg::HumanDetections>("/humanDetections",10,
