@@ -1,7 +1,7 @@
 <launch>
 
   <node pkg="rosbag" type="play" name="playBags"
-   args="-l -d 1 -r 0.3
+   args="-l -d 1 -r .5
      $(find accompany_uva)/res/testRobotHouse/camera1/retopic.bag
      $(find accompany_uva)/res/testRobotHouse/camera3/retopic.bag
      "/>
@@ -30,15 +30,8 @@
         args="-p camera_frame -c camera3 -e $(find accompany_uva)/res/testRobotHouse/cameras/camera_extrinsic3.xml"/>
 
 
-  <!-- view -->
-  <node pkg="image_view" type="image_view" name="$(anon image_view)"
-  	args="image:=/camera1/image_raw"/>
-  <node pkg="image_view" type="image_view" name="$(anon image_view)"
-  	args="image:=/camera3/image_raw"/>
-
-
   <!-- detect -->
-  <node pkg="accompany_static_camera_localisation" type="camera_localization" name="camera_localization" output="screen"
+  <node pkg="accompany_static_camera_localisation" type="camera_localization" name="camera_localization"
         args="-p $(find accompany_uva)/res/testRobotHouse/cameras/params.xml -n 4 -t 7 -v"/>
 
 
