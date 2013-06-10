@@ -19,17 +19,18 @@ int main(int argc,char **argv)
   ros::init(argc, argv, "human_tracker");
 
   string param_path;
-  double stateThreshold,appearanceThreshold,appearanceUpdate,maxSpeed;
+  double stateThreshold,appearanceThreshold,appearanceUpdate,maxSpeed,maxCovar;
 
   // handling command line arguments
   program_options::options_description optionsDescription("Tracks humans using human detections");
   optionsDescription.add_options()
     ("help,h","show help message")
     ("path,p", program_options::value<string>(&param_path)->required(),"path to pior.txt and entryExit.txt")
-    ("stateThreshold,s",program_options::value<double>(&stateThreshold)->default_value(-6),"threshold on the kalman filter state")
-    ("appearanceThreshold,a",program_options::value<double>(&appearanceThreshold)->default_value(-20),"threshold on the appearance")
+    ("stateThreshold,s",program_options::value<double>(&stateThreshold)->default_value(-0.2),"threshold on the kalman filter state")
+    ("appearanceThreshold,a",program_options::value<double>(&appearanceThreshold)->default_value(-1),"threshold on the appearance")
     ("appearanceUpdate,u",program_options::value<double>(&appearanceUpdate)->default_value(0.02),"weight of new appearance vs old one")
-    ("maxSpeed,m",program_options::value<double>(&maxSpeed)->default_value(4),"maximum speed of a track");
+    ("maxSpeed,m",program_options::value<double>(&maxSpeed)->default_value(4),"maximum speed of a track")
+    ("maxCovariance,c",program_options::value<double>(&maxCovar)->default_value(30),"maximum covariance");
   program_options::variables_map variablesMap;
   try
   {
@@ -39,7 +40,7 @@ int main(int argc,char **argv)
   }
   catch (const std::exception& e)
   {
-    cerr<<""<<e.what()<<endl;    
+    cerr<<""<<e.what()<<endl;
     return 1;
   }
   
@@ -63,7 +64,8 @@ int main(int argc,char **argv)
                   stateThreshold,
                   appearanceThreshold,
                   appearanceUpdate,
-                  maxSpeed);
+                  maxSpeed,
+                  maxCovar);
   
   // subscribers
   ros::Subscriber humanDetectionsSub=n.subscribe<accompany_uva_msg::HumanDetections>("/humanDetections",10,

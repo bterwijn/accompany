@@ -23,6 +23,7 @@ Tracker::Tracker(const ros::Publisher& trackedHumansPub,
                  double appearanceThreshold,
                  double appearanceUpdate,
                  double maxSpeed,
+                 double maxCovar,
                  unsigned minMatchCount,
                  unsigned maxUnmatchCount)
 {
@@ -34,6 +35,7 @@ Tracker::Tracker(const ros::Publisher& trackedHumansPub,
   this->appearanceThreshold=appearanceThreshold;
   this->appearanceUpdate=appearanceUpdate;
   this->maxSpeed=maxSpeed;
+  this->maxCovar=maxCovar;
   this->minMatchCount=minMatchCount;
   this->maxUnmatchCount=maxUnmatchCount;
   // kalman motion and observation model
@@ -80,6 +82,8 @@ double timeDiff(const struct timeval& time,
 void Tracker::processDetections(const accompany_uva_msg::HumanDetections::ConstPtr& humanDetections)
 {
   cout<<"-received "<<humanDetections->detections.size()<<" HumanDetections"<<endl;
+  //for (unsigned i=0;i<humanDetections->detections.size();i++)
+  //  cout<<humanDetections->detections[i]<<endl;
   if (humanDetections->detections.size()>0)
     coordFrame=humanDetections->detections[0].location.header.frame_id;
 
@@ -93,7 +97,7 @@ void Tracker::processDetections(const accompany_uva_msg::HumanDetections::ConstP
     transModel[1][3]=diff;
   }
   for (unsigned i=0;i<tracks.size();i++)
-    tracks[i].transition(transModel,transCovariance);
+    tracks[i].transition(transModel,transCovariance,maxCovar);
 
   // associate observations with tracks
   dataAssociation.clear(tracks.size(),humanDetections->detections.size());
@@ -130,7 +134,7 @@ void Tracker::processDetections(const accompany_uva_msg::HumanDetections::ConstP
       if (inside(toWorldPoint(humanDetections->detections[i]),entryExitHulls))
       {
         cout<<"unassociated detection in entryExitHulls, new track started"<<endl;
-        tracks.push_back(Track(humanDetections->detections[i]));
+        tracks.push_back(Track(humanDetections->detections[i],maxCovar));
       }
       else
         cout<<"unassociated detection NOT in entryExitHulls, ignore"<<endl;
@@ -141,7 +145,8 @@ void Tracker::processDetections(const accompany_uva_msg::HumanDetections::ConstP
       tracks[associations[i]].observation(humanDetections->detections[i],
                                           appearanceUpdate,
                                           obsModel,
-                                          obsCovariance);
+                                          obsCovariance,
+                                          maxCovar);
       tracks[associations[i]].maxSpeed(maxSpeed);
     }
   }

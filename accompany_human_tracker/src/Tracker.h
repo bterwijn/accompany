@@ -26,8 +26,9 @@ class Tracker
           const std::vector< std::vector<WorldPoint> >& entryExitHulls,
           double stateThreshold,
           double appearanceThreshold,
-          double maxSpeed,
           double appearanceUpdate,
+          double maxSpeed,
+          double maxCovar,
           unsigned minMatchCount=10,
           unsigned maxUnmatchCount=20);
   
@@ -46,7 +47,7 @@ class Tracker
   std::vector<WorldPoint> priorHull;
   std::vector< std::vector<WorldPoint> > entryExitHulls;
   
-  double stateThreshold,appearanceThreshold,appearanceUpdate,maxSpeed;
+  double stateThreshold,appearanceThreshold,appearanceUpdate,maxSpeed,maxCovar;
   unsigned minMatchCount,maxUnmatchCount;
 
   vnl_matrix<double>

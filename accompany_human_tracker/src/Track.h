@@ -16,7 +16,8 @@ class Track
 {
  public:
   
-  Track(const accompany_uva_msg::HumanDetection& humanDetection);
+  Track(const accompany_uva_msg::HumanDetection& humanDetection,
+        double maxCovar);
   
   unsigned getID();
 
@@ -29,12 +30,16 @@ class Track
   double matchAppearance(const accompany_uva_msg::HumanDetection& humanDetection);
 
   void transition(const vnl_matrix<double>& transModel,
-                  const vnl_matrix<double>& transCovariance);
+                  const vnl_matrix<double>& transCovariance,
+                  double maxCovar);
   void observation(const accompany_uva_msg::HumanDetection& humanDetection,
                    const double appearanceUpdate,
                    const vnl_matrix<double>& obsModel,
-                   const vnl_matrix<double>& obsCovariance);
+                   const vnl_matrix<double>& obsCovariance,
+                   double maxCovar);
   
+  
+
   void maxSpeed(double maxSpeed);
 
   void addUnmatchCount();
@@ -60,8 +65,7 @@ class Track
   static vnl_vector<double> getObs(const accompany_uva_msg::HumanDetection& humanDetection);
   static vnl_matrix<double> getObsCovariance(const accompany_uva_msg::HumanDetection& humanDetection);
   void updateAppearance(double weight,const accompany_uva_msg::Appearance& newAppearance);
-  
-  
+  void limitCovariance(double max);
 
 };
 
