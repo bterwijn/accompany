@@ -7,40 +7,47 @@ mkdir -p ~/programs
 mkdir -p ~/ros
 
 # init 
-sudo apt-get -y install aptitude emacs git gitk mercurial libopencv2.3-dev cmake gtk2-engines-pixbuf 
+sudo apt-get -y install aptitude emacs git gitk mercurial libopencv-dev cmake gtk2-engines-pixbuf 
 
 # gstreamer
-sudo apt-get -y install gstreamer-tools gstreamer0.10-plugins-base gstreamer0.10-plugins-good gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly gstreamer0.10-ffmpeg
+sudo apt-get -y install gstreamer-tools gstreamer0.10-plugins-base gstreamer0.10-plugins-good gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly gstreamer0.10-ffmpeg libgstreamer0.10-dev 
+libgstreamer-plugins-bad0.10-dev libgstreamer-plugins-base0.10-dev
+
+# vxl for ubuntu >= 12.04
+sudo apt-get -y install libvxl1-dev
 
 cd ~/ros
 git clone git://basterwijn.nl/home/bterwijn/git/accompany.git
 cd
 
 # ros
-sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu oneiric main" > /etc/apt/sources.list.d/ros-latest.list'
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu precise main" > /etc/apt/sources.list.d/ros-latest.list'
 wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
 sudo apt-get update
-sudo apt-get -y install ros-electric-desktop-full
+sudo apt-get -y install ros-groovy-desktop-full
+
+sudo rosdep init
+rosdep update
 echo "" >> ~/.bashrc
 echo "# ROS" >> ~/.bashrc
-echo "source /opt/ros/electric/setup.bash" >> ~/.bashrc
+echo "source /opt/ros/groovy/setup.bash" >> ~/.bashrc
 echo "export ROS_WORKSPACE=~/ros" >> ~/.bashrc
 echo "export ROS_PACKAGE_PATH=\$ROS_WORKSPACE:\$ROS_PACKAGE_PATH" >> ~/.bashrc
 . ~/.bashrc
-source /opt/ros/electric/setup.bash
+source /opt/ros/groovy/setup.bash
 export ROS_WORKSPACE=~/ros
 export ROS_PACKAGE_PATH=$ROS_WORKSPACE:$ROS_PACKAGE_PATH
 
-# vxl
-cd ~/programs
-wget http://downloads.sourceforge.net/project/vxl/vxl/1.17/vxl-1.17.0.zip
-unzip vxl-1.17.0.zip
-cd vxl-1.17.0/
-mkdir build
-cd build
-cmake .. -DBUILD_BRL=OFF
-make -j 4
-sudo make install
+# vxl only applicable when Ubuntu < 12.04
+# cd ~/programs
+# wget http://downloads.sourceforge.net/project/vxl/vxl/1.17/vxl-1.17.0.zip
+# unzip vxl-1.17.0.zip
+# cd vxl-1.17.0/
+# mkdir build
+# cd build
+# cmake .. -DBUILD_BRL=OFF
+# make -j 4
+# sudo make install
 
 # cmnGwenn
 cd ~/programs
@@ -92,12 +99,6 @@ cmake ../
 make -j 4
 sudo make install
 
-# skeleton_marker
-cd ~/ros
-svn checkout http://pi-robot-ros-pkg.googlecode.com/svn/trunk/skeleton_markers
-rosdep install skeleton_markers
-rosmake skeleton_markers
-
 # cob_perception_common
 cd ~/ros
 git clone git://github.com/ipa320/cob_perception_common.git
@@ -115,22 +116,22 @@ rosdep install gscam
 rosmake gscam
 
 # map server
-sudo apt-get -y install ros-electric-navigation
+sudo apt-get -y install ros-groovy-navigation
 rosdep install navigation
 rosmake navigation
 
 # rviz
-sudo apt-get -y install ros-electric-viz
+sudo apt-get -y install ros-groovy-viz
 rosdep install rviz
 rosmake rviz
 
 # rospy
-#sudo apt-get -y install ros-electric-rospy
+#sudo apt-get -y install ros-groovy-rospy
 rosdep install rospy
 rosmake rospy
 
 # rosbag
-#sudo apt-get -y install ros-electric-rosbag
+#sudo apt-get -y install ros-groovy-rosbag
 rosdep install rosbag
 rosmake rosbag
 
