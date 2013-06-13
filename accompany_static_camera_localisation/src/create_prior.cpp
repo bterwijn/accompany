@@ -55,6 +55,7 @@ void mouseHandler(int idx, int event, int x, int y, int flags, void *)
 {
   pt = cam[idx].getGroundPos(cvPoint(x,y));
   ptValid=true;
+  cout<<"WorldPoint: "<<pt<<endl;
 
   switch (event) 
   {
