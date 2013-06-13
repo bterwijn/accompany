@@ -184,11 +184,11 @@ int main(int argc, char **argv)
   cout << "-------------------------------------" << endl;
 
   Mat dst_points = Mat::zeros(Size(2, 3), CV_32F);
-  cout << "input the world coordinates of point " << text[0] << ", separate with SPACE" << endl;
+  cout << "input the world coordinates of point (ONLY TWO NUMBERS!) " << text[0] << ", separate with SPACE" << endl;
   cin >> dst_points.at<float>(0, 0) >> dst_points.at<float>(0, 1);
-  cout << "input the world coordinates of point " << text[1] << ", separate with SPACE" << endl;
+  cout << "input the world coordinates of point (ONLY TWO NUMBERS!)" << text[1] << ", separate with SPACE" << endl;
   cin >> dst_points.at<float>(1, 0) >> dst_points.at<float>(1, 1);
-    cout << "input the world coordinates of point " << text[2] << ", separate with SPACE" << endl;
+  cout << "input the world coordinates of point (ONLY TWO NUMBERS!)" << text[2] << ", separate with SPACE" << endl;
   cin >> dst_points.at<float>(2, 0) >> dst_points.at<float>(2, 1);
 //  cout << "input the world coordinates of 'Y', separate with SPACE" << endl;
 //  dst_points.at<float>(2, 0) = dst_points.at<float>(1, 1) * (-1);
