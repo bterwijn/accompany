@@ -148,10 +148,32 @@ Intrinsic calibration:
 
   rosrun accompany_static_camera_localisation calibration_intrinsic -w 6 -h 8 -m ../mask_large.png -k 5 -a 1 -rm -p -zt -o ../camera_intrinsic.xml calib_list.xml
 
-Test:
+
+Test calibration:
+
+  - undistort single frame -
 
   roscd accompany_static_camera_localisation/res/calib_frames
+
   rosrun accompany_static_camera_localisation undistortion_test -s [image] -i [camera_intrinsic] -f
+
+
+  - show live stream -
+
+  restart gscam node with
+
+    roscd accompany_static_camera_localisation/res
+
+    rosrun gscam gscam -s 0 -i camera_intrinsic.xml
+
+  generate undistorted stream
+
+    ROS_NAMESPACE=/gscam rosrun image_proc image_proc 
+
+  view live stream
+
+    rosrun image_view image_view image:=/gscam/image_rect_color
+    
 
 ----------------------------------------
 
