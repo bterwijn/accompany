@@ -149,7 +149,7 @@ Intrinsic calibration:
   rosrun accompany_static_camera_localisation calibration_intrinsic -w 6 -h 8 -m ../mask_large.png -k 5 -a 1 -rm -p -zt -o ../camera_intrinsic.xml calib_list.xml
 
 
-Test calibration:
+Test intrinsic calibration:
 
   - undistort single frame -
 
@@ -224,7 +224,7 @@ Modify param.xml and set SCALE according to the desired resolution
 
 ----------------------------------------
 
-#-- Build background model --#
+#-- Build background model --# (adaptive background integrated, no need for this part any more)
 
 roscd accompany_static_camera_localisation/scripts/
 
@@ -251,9 +251,20 @@ Both:
 Select a walkable region:
 
   roscd accompany_static_camera_localisation/res
-
-  rosrun accompany_static_camera_localisation create_prior -l background_images/background_list.txt -p params.xml -o prior.txt -i camera_intrinsic.xml -e camera_extrinsic.xml
   
+
+  rosrun accompany_static_camera_localisation create_prior -l ./image_list.txt -p ./params.xml
+
+  columns of image_list.txt are camera index
+
+  #rosrun accompany_static_camera_localisation create_prior -l ./marker_list.txt -p ./params.xml
+  #rosrun accompany_static_camera_localisation create_prior -l background_images/background_list.txt -p params.xml -o prior.txt -i camera_intrinsic.xml -e camera_extrinsic.xml
+  
+---------------------------------------
+
+#-- Create Entrance Area --#
+
+rosrun accompany_static_camera_localisation create_entry_exit_areas -l ./image_list.txt -p ./params.xml
 ----------------------------------------
 
 #-- Check calibration --#
