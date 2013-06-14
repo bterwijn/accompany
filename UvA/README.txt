@@ -144,9 +144,10 @@ Create a image list:
   rosrun accompany_static_camera_localisation create_calibration_list calib_list.xml *.jpg
   cat calib_list.xml
     
-Intrinsic calibration:
+Intrinsic calibration: (calibration improved by adding masks)
 
-  rosrun accompany_static_camera_localisation calibration_intrinsic -w 6 -h 8 -m ../mask_large.png -k 5 -a 1 -rm -p -zt -o ../camera_intrinsic.xml calib_list.xml
+  rosrun accompany_static_camera_localisation calibration_intrinsic -w 6 -h 8 -m ../mask_large.png -k 5 -a 1 -rm -p -zt -o ../camera_intrinsic.xml calib_list.xml 
+
 
 
 Test intrinsic calibration:
