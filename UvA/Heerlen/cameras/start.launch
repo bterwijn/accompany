@@ -22,12 +22,23 @@
   <!-- human detection -->
 
   <node pkg="accompany_static_camera_localisation" type="camera_localization" name="camera_localization"
-        args="-p /home/accompany/ros/accompany/UvA/Heerlen/cameras/params.xml -n 4 -t 7 -v"/>
+        args="-p /home/accompany/ros/accompany/UvA/Heerlen/cameras/params.xml -n 5 -t 8 -v"/>
 
 
   <!-- human tracker -->
 
   <node pkg="accompany_human_tracker" type="human_tracker" name="human_tracker" output="screen"
         args="-p /home/accompany/ros/accompany/UvA/Heerlen/cameras"/>
+
+
+  <!-- cameras tf -->
+
+  <node pkg="accompany_static_camera_localisation" type="publish_tf_from_extrinsic" name="$(anon publish_tf_from_extrinsic)"
+        args="-p room_frame -c camera_sofa -e /home/accompany/ros/accompany/UvA/Heerlen/camera_sofa/camera_extrinsic.xml"/>
+  
+  <node pkg="accompany_static_camera_localisation" type="publish_tf_from_extrinsic" name="$(anon publish_tf_from_extrinsic)"
+        args="-p room_frame -c camera_kitchen -e /home/accompany/ros/accompany/UvA/Heerlen/camera_kitchen/camera_extrinsic.xml"/>
+
+
 
 </launch>
