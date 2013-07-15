@@ -69,11 +69,11 @@ using namespace GausMix;
 #define DYNBG_MAXGAUS 3
 #define INIT_FIRST_FRAMES 1 // use first X frames to initializa the background model
 vector<GaussianMixture<DYNBG_GAUS,DYNBG_TYPE,DYNBG_MAXGAUS> *> gaussianMixtures(CAM_NUM);
-DYNBG_TYPE decay=1/800.0f;
+DYNBG_TYPE decay=1/600.0f;
 DYNBG_TYPE initVar=5;
 DYNBG_TYPE minWeight=.2;
 DYNBG_TYPE squareMahanobisMatch=10;
-DYNBG_TYPE weightReduction=0.008;
+DYNBG_TYPE weightReduction=0.01;
 const char* dynBGProb = "Background Probability";
 
 // vizualize
