@@ -100,9 +100,9 @@ visualization_msgs::MarkerArray &MsgToMarkerArray::toMarkerArray(const accompany
     double angle=atan2(sy,sx);
     double length=sqrt(sx*sx+sy*sy); 
     markerArray.markers[ind].pose.orientation=tf::createQuaternionMsgFromRollPitchYaw(0,0,angle);// yaw
-    markerArray.markers[ind].scale.x = .5;
-    markerArray.markers[ind].scale.y = .5;
-    markerArray.markers[ind].scale.z = length;
+    markerArray.markers[ind].scale.x = length;
+    markerArray.markers[ind].scale.y = .1;
+    markerArray.markers[ind].scale.z = .1;
     markerArray.markers[ind].color.r = 1.0;
     markerArray.markers[ind].color.g = 0.0;
     markerArray.markers[ind].color.b = 0.0;
