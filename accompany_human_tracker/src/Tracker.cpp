@@ -176,10 +176,16 @@ void Tracker::identityReceived(const cob_people_detection_msgs::DetectionArray::
       geometry_msgs::PoseStamped pose=detectionArray->detections[i].pose;
       try// transform to HumanDetections coordinate system
       {
-        transformListener.waitForTransform(pose.header.frame_id,coordFrame,pose.header.stamp,ros::Duration(.3));
         geometry_msgs::PoseStamped transPose;
+        /*transformListener.waitForTransform(pose.header.frame_id,coordFrame,pose.header.stamp,ros::Duration(.3));
         transformListener.transformPose(coordFrame,
                                         pose,
+                                        transPose); */ // to slow
+        ros::Time past=ros::Time::now()-ros::Duration(0.2); // time slightly in past to trick tf into tranforming imediately
+        transformListener.transformPose(coordFrame,
+                                        past,
+                                        pose,
+                                        pose.header.frame_id,
                                         transPose);
         geometry_msgs::PointStamped transTFPoint;
         transTFPoint.header=transPose.header;
@@ -200,29 +206,39 @@ void Tracker::identityReceived(const cob_people_detection_msgs::DetectionArray::
  */
 void Tracker::tfCallBack(const tf::tfMessage& tf)
 {  
-  if (tf.transforms[0].child_frame_id=="/base_link") // if robot
+  for (unsigned i=0;i<tf.transforms.size();i++)
   {
-    cout<<"-received robot position"<<endl;
-    if (coordFrame.size()>0) // if HumanDetections coordinate frame is known
+    if (tf.transforms[i].child_frame_id=="/base_link") // if robot
     {
-      try// transform to HumanDetections coordinate system
+      cout<<"-received robot position"<<endl;
+      if (coordFrame.size()>0) // if HumanDetections coordinate frame is known
       {
-        geometry_msgs::PointStamped tfPoint;
-        tfPoint.header=tf.transforms[0].header;
-        tfPoint.point.x=tf.transforms[0].transform.translation.x;
-        tfPoint.point.y=tf.transforms[0].transform.translation.y;
-        tfPoint.point.z=tf.transforms[0].transform.translation.z;
-        transformListener.waitForTransform(tfPoint.header.frame_id,coordFrame,tfPoint.header.stamp,ros::Duration(.3));
-        geometry_msgs::PointStamped transTFPoint;
-        transformListener.transformPoint(coordFrame,
-                                         tfPoint,
-                                         transTFPoint);
-        label(transTFPoint,"robot");
+        try// transform to HumanDetections coordinate system
+        {
+          geometry_msgs::PointStamped tfPoint;
+          tfPoint.header=tf.transforms[i].header;
+          tfPoint.point.x=tf.transforms[i].transform.translation.x;
+          tfPoint.point.y=tf.transforms[i].transform.translation.y;
+          tfPoint.point.z=tf.transforms[i].transform.translation.z;
+          geometry_msgs::PointStamped transTFPoint;
+          /*transformListener.waitForTransform(tfPoint.header.frame_id,coordFrame,tfPoint.header.stamp,ros::Duration(.01));
+          transformListener.transformPoint(coordFrame,
+                                           tfPoint,
+                                           transTFPoint);*/ // to slow
+          ros::Time past=ros::Time::now()-ros::Duration(0.2); // time slightly in past to trick tf into tranforming imediately
+          transformListener.transformPoint(coordFrame,
+                                           past,
+                                           tfPoint,
+                                           tfPoint.header.frame_id,
+                                           transTFPoint);
+          label(transTFPoint,"robot");
+        }
+        catch (tf::TransformException e)
+        {
+          cerr<<"error while tranforming robot location: "<<e.what()<<endl;
+        }
       }
-      catch (tf::TransformException e)
-      {
-        cerr<<"error while tranforming human location: "<<e.what()<<endl;
-      }
+      break;
     }
   }
 }
