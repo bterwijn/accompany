@@ -17,16 +17,16 @@
         args="theora in:=/camera_sofa/image_raw raw out:=camera_sofa/image_raw"/>
   <!-- pulish tf of camera -->
   <node pkg="accompany_static_camera_localisation" type="publish_tf_from_extrinsic" name="$(anon publish_tf_from_extrinsic)"
-        args="-p camera_frame -c camera_sofa -e $(find accompany_uva)/res/Heerlen/camera_extrinsic_sofa.xml"/>
-   
+        args="-p room_frame -c camera_sofa -e $(find accompany_uva)/res/Heerlen/camera_extrinsic_sofa.xml"/>
+
 
   <!-- camera_kitchen -->
   <node pkg="image_transport" type="republish" name="$(anon republish)" 
         args="theora in:=/camera_kitchen/image_raw raw out:=camera_kitchen/image_raw"/>
   <!-- pulish tf of camera -->
   <node pkg="accompany_static_camera_localisation" type="publish_tf_from_extrinsic" name="$(anon publish_tf_from_extrinsic)"
-        args="-p camera_frame -c camera_kitchen -e $(find accompany_uva)/res/Heerlen/camera_extrinsic_kitchen.xml"/>
- 
+        args="-p room_frame -c camera_kitchen -e $(find accompany_uva)/res/Heerlen/camera_extrinsic_kitchen.xml"/>
+
 
 
   <!-- detect -->
