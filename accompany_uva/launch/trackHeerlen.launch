@@ -2,46 +2,45 @@
 
   <!-- rosbag -->
   <node pkg="rosbag" type="play" name="playBags"
-        args="-d 1 -r 1 $(find accompany_uva)/res/Heerlen/2013-06-14-14-04-42.bag"/>
+        args="-d 1 -r 1 $(find accompany_uva)/res/Heerlen/2013-06-14-13-59-27.bag
+        --topics 
+        /camera_kitchen/camera_info 
+        /camera_kitchen/image_raw/theora 
+        /camera_sofa/camera_info 
+        /camera_sofa/image_raw/theora 
+        /map /map_metadata 
+        /tf"/>
 
 
   <!-- camera_sofa -->
   <node pkg="image_transport" type="republish" name="$(anon republish)" 
         args="theora in:=/camera_sofa/image_raw raw out:=camera_sofa/image_raw"/>
-  <!-- UvA code to pulish tf of camera
+  <!-- pulish tf of camera -->
   <node pkg="accompany_static_camera_localisation" type="publish_tf_from_extrinsic" name="$(anon publish_tf_from_extrinsic)"
-        args="-p camera_frame -c camera_sofa -e $(find accompany_uva)/res/testRobotHouse/cameras/camera_extrinsic_sofa.xml"/>
-  -->
+        args="-p camera_frame -c camera_sofa -e $(find accompany_uva)/res/Heerlen/camera_extrinsic_sofa.xml"/>
+   
 
   <!-- camera_kitchen -->
   <node pkg="image_transport" type="republish" name="$(anon republish)" 
         args="theora in:=/camera_kitchen/image_raw raw out:=camera_kitchen/image_raw"/>
-  <!-- UvA code to pulish tf of camera
+  <!-- pulish tf of camera -->
   <node pkg="accompany_static_camera_localisation" type="publish_tf_from_extrinsic" name="$(anon publish_tf_from_extrinsic)"
-        args="-p camera_frame -c camera_kitchen -e $(find accompany_uva)/res/testRobotHouse/cameras/camera_extrinsic_kitchen.xml"/>
-  -->
-
-  <!-- camera_kitchen -->
-  <node pkg="image_view" type="image_view" name="$(anon view)" 
-        args="image:=/camera_kitchen/image_raw"/>
-
-  <!-- camera_sofa -->
-  <node pkg="image_view" type="image_view" name="$(anon view)" 
-        args="image:=/camera_sofa/image_raw"/>      
+        args="-p camera_frame -c camera_kitchen -e $(find accompany_uva)/res/Heerlen/camera_extrinsic_kitchen.xml"/>
+ 
 
 
-  <!-- detect 
+  <!-- detect -->
   <node pkg="accompany_static_camera_localisation" type="camera_localization" name="camera_localization"
-        args="-p $(find accompany_uva)/res/testRobotHouse/cameras/params.xml -n 4 -t 7 -v"/>
-  -->
-
-  <!-- track humans using localisation data
-  <node pkg="accompany_human_tracker" type="human_tracker" name="human_tracker" output="screen"
-        args="-p $(find accompany_uva)/res/testRobotHouse/cameras"/>
-  --> 
+        args="-p $(find accompany_uva)/res/Heerlen/params.xml -n 4 -t 7 -v"/>
   
-  <!-- Map server
-  <node pkg="map_server" type="map_server" name="map_server" args="$(find accompany_uva)/res/testRobotHouse/map.yaml"/>
-   -->
+
+  <!-- track humans using localisation data -->
+  <node pkg="accompany_human_tracker" type="human_tracker" name="human_tracker" output="screen"
+        args="-p $(find accompany_uva)/res/Heerlen"/>
+  
+
+  <!-- Map server -->
+  <node pkg="map_server" type="map_server" name="map_server" args="$(find accompany_uva)/res/Heerlen/map.yaml"/>
+   
 
 </launch>
