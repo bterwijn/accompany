@@ -26,9 +26,9 @@ int main(int argc,char **argv)
   optionsDescription.add_options()
     ("help,h","show help message")
     ("path,p", program_options::value<string>(&param_path)->required(),"path to pior.txt and entryExit.txt")
-    ("stateThreshold,s",program_options::value<double>(&stateThreshold)->default_value(-0.2),"threshold on the kalman filter state")
-    ("appearanceThreshold,a",program_options::value<double>(&appearanceThreshold)->default_value(-1),"threshold on the appearance")
-    ("appearanceUpdate,u",program_options::value<double>(&appearanceUpdate)->default_value(0.02),"weight of new appearance vs old one")
+    ("stateThreshold,s",program_options::value<double>(&stateThreshold)->default_value(-0.1),"threshold on the kalman filter state")
+    ("appearanceThreshold,a",program_options::value<double>(&appearanceThreshold)->default_value(-0.5),"threshold on the appearance")
+    ("appearanceUpdate,u",program_options::value<double>(&appearanceUpdate)->default_value(0.05),"weight of new appearance vs old one")
     ("maxSpeed,m",program_options::value<double>(&maxSpeed)->default_value(4),"maximum speed of a track")
     ("maxCovariance,c",program_options::value<double>(&maxCovar)->default_value(30),"maximum covariance");
   program_options::variables_map variablesMap;
