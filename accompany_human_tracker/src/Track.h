@@ -16,9 +16,10 @@ class Track
 {
  public:
   
-  Track(const accompany_uva_msg::HumanDetection& humanDetection,
-        double maxCovar);
-  
+  Track(const geometry_msgs::PointStamped& pointStamped,double maxCovar);
+  Track(const accompany_uva_msg::HumanDetection& humanDetection,double maxCovar);
+  void init();
+
   unsigned getID();
 
   double match(const accompany_uva_msg::HumanDetection& humanDetection,
@@ -34,6 +35,12 @@ class Track
                   double maxCovar);
   void observation(const accompany_uva_msg::HumanDetection& humanDetection,
                    const double appearanceUpdate,
+                   const vnl_matrix<double>& obsModel,
+                   const vnl_matrix<double>& obsCovariance,
+                   double maxCovar);
+
+  bool isRobot();
+  void updateRobot(const geometry_msgs::PointStamped& pointStamped,
                    const vnl_matrix<double>& obsModel,
                    const vnl_matrix<double>& obsCovariance,
                    double maxCovar);
@@ -57,12 +64,14 @@ class Track
   unsigned matchCount; // number of times matched by observation
   unsigned unmatchedCount; // number consecutive unmatched
   double humanProb;
-
+  bool isRobotFlag;
+  
  private:
   static unsigned nextID;
   unsigned id;
   KalmanFilter<double> kalmanFilter;
   accompany_uva_msg::Appearance appearance;
+  bool appearanceValid;
 
   static vnl_vector<double> getObs(const accompany_uva_msg::HumanDetection& humanDetection);
   static vnl_matrix<double> getObsCovariance(const accompany_uva_msg::HumanDetection& humanDetection);

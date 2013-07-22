@@ -183,7 +183,7 @@ void Tracker::identityReceived(const cob_people_detection_msgs::DetectionArray::
         transformListener.transformPose(coordFrame,
                                         pose,
                                         transPose); */ // to slow
-        ros::Time past=ros::Time::now()-ros::Duration(0.2); // time slightly in past to trick tf into tranforming imediately
+        ros::Time past=ros::Time::now()-ros::Duration(0.1); // time slightly in past to trick tf into tranforming imediately
         transformListener.transformPose(coordFrame,
                                         past,
                                         pose,
@@ -228,13 +228,26 @@ void Tracker::tfCallBack(const tf::tfMessage& tf)
           //transformListener.transformPoint(coordFrame,
                                            //tfPoint,
                                            //transTFPoint); // to slow
-          ros::Time past=ros::Time::now()-ros::Duration(0.2); // time slightly in past to trick tf into tranforming imediately
+          ros::Time past=ros::Time::now()-ros::Duration(0.1); // time slightly in past to trick tf into tranforming imediately
           transformListener.transformPoint(coordFrame,
                                            past,
                                            tfPoint,
                                            tfPoint.header.frame_id,
                                            transTFPoint);
-	  label(transTFPoint,"robot");
+	  //label(transTFPoint,"robot");
+          int robotIndex=getRobotIndex();
+          if (robotIndex>=0) // have robot Track
+          {
+            tracks[robotIndex].updateRobot(transTFPoint,
+                                           obsModel,
+                                           obsCovariance,
+                                           maxCovar);
+          }
+          else // no robot Track
+          {
+            cout<<"unassociated detection in entryExitHulls, new track started"<<endl;
+            tracks.push_back(Track(transTFPoint,maxCovar));
+          }
         }
         catch (tf::TransformException e)
         {
@@ -393,4 +406,12 @@ unsigned Tracker::getMaxHumanProbIndex()
       index=i;
     }
   return index;
+}
+
+int Tracker::getRobotIndex()
+{
+  for (unsigned i=0;i<tracks.size();i++)
+    if (tracks[i].isRobot())
+      return i;
+  return -1;
 }
