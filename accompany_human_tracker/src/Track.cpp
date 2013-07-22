@@ -335,12 +335,18 @@ void Track::updateAppearance(double weight,const accompany_uva_msg::Appearance& 
 vnl_vector<double> Track::getPosition()
 {
   vnl_vector<double> v(3,0);
+  v[0]=kalmanFilter.getState()[0];
+  v[1]=kalmanFilter.getState()[1];
+  v[2]=0;
   return v;
 }
 
-vnl_vector<double> getSpeed()
+vnl_vector<double> Track::getSpeed()
 {
   vnl_vector<double> v(3,0);
+  v[0]=kalmanFilter.getState()[2];
+  v[1]=kalmanFilter.getState()[3];
+  v[2]=0;
   return v;
 }
 

@@ -142,13 +142,25 @@ void Tracker::processDetections(const accompany_uva_msg::HumanDetections::ConstP
     else // assigned
     {
       assignedCount++;
+      vnl_vector<double> speedBefore=tracks[associations[i]].getSpeed();
       tracks[associations[i]].observation(humanDetections->detections[i],
                                           appearanceUpdate,
                                           obsModel,
                                           obsCovariance,
                                           maxCovar);
+      vnl_vector<double> speedAfter=tracks[associations[i]].getSpeed();
       tracks[associations[i]].maxSpeed(maxSpeed);
-      tracks[associations[i]].humanProb+=detect_human_score;
+      tracks[associations[i]].humanProb+=detect_human_score; // more likely a human
+      double sp=speedAfter.two_norm();
+      if (sp>0.1)
+      {
+        tracks[associations[i]].humanProb+=velocity_human_score; // even more likely a human
+        double smoothSp=(speedAfter-speedBefore).two_norm();
+        if (smoothSp<sp*0.1)
+        {
+          tracks[associations[i]].humanProb+=smooth_velocity_human_score; // even more likely a human
+        }
+      }
     }
   }
   normalizeHumanProb();
@@ -358,6 +370,7 @@ void Tracker::publishTracks()
       tracks[i].writeMessage(trackedHuman);
       string name=idToName.getIDName(tracks[i].getID());
 
+      trackedHuman.specialFlag=0;
       if (tracks[i].isRobot())
       {
         trackedHuman.identity="robot";
@@ -370,8 +383,6 @@ void Tracker::publishTracks()
           trackedHuman.identity="";
         if (i==humanIndex)
           trackedHuman.specialFlag=1;
-        else
-          trackedHuman.specialFlag=0;
       }
       trackedHumans.trackedHumans.push_back(trackedHuman);
     }

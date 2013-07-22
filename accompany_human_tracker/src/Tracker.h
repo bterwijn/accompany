@@ -21,8 +21,9 @@ class Tracker
 {
  public:
   
-  static const double detect_human_score=0.01;
-  static const double smooth_velocity_human_score=0.02;
+  static const double detect_human_score=0.001;
+  static const double velocity_human_score=0.005;
+  static const double smooth_velocity_human_score=0.01;
 
   Tracker(const ros::Publisher& trackedHumansPub,
           const ros::Publisher& markerArrayPub,
