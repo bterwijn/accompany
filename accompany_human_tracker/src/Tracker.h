@@ -73,7 +73,7 @@ class Tracker
   void removeTracks();
   void publishTracks();
   void normalizeHumanProb();
-  unsigned getMaxHumanProbIndex();
+  int getMaxHumanProbIndex();
   int getRobotIndex();
 };
 

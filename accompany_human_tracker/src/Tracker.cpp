@@ -350,21 +350,29 @@ void Tracker::publishTracks()
   trackedHuman.specialFlag=0;
   trackedHuman.location.header.stamp=ros::Time::now();
   trackedHuman.location.header.frame_id=coordFrame;
-  unsigned humanIndex=getMaxHumanProbIndex();
+  int humanIndex=getMaxHumanProbIndex();
   for (unsigned i=0;i<tracks.size();i++)
   {
     if (tracks[i].matchCount>=minMatchCount) // only tracks with proper match count
     {
       tracks[i].writeMessage(trackedHuman);
       string name=idToName.getIDName(tracks[i].getID());
-      if (name.compare(IDToName::unkown)!=0)
-        trackedHuman.identity=name;
+
+      if (tracks[i].isRobot())
+      {
+        trackedHuman.identity="robot";
+      }
       else
-        trackedHuman.identity="";
-      if (i==humanIndex)
-	trackedHuman.specialFlag=1;
-      else
-	trackedHuman.specialFlag=0;
+      {
+        if (name.compare(IDToName::unkown)!=0)
+          trackedHuman.identity=name;
+        else
+          trackedHuman.identity="";
+        if (i==humanIndex)
+          trackedHuman.specialFlag=1;
+        else
+          trackedHuman.specialFlag=0;
+      }
       trackedHumans.trackedHumans.push_back(trackedHuman);
     }
   }
@@ -395,16 +403,21 @@ void Tracker::normalizeHumanProb()
       it->humanProb/=sum;
 }
 
-unsigned Tracker::getMaxHumanProbIndex()
+int Tracker::getMaxHumanProbIndex()
 {
-  unsigned index=0;
+  int index=-1;
   double max=0;
   for (unsigned i=0;i<tracks.size();i++)
-    if (tracks[i].humanProb>max)
+  {
+    if (!tracks[i].isRobot())
     {
-      max=tracks[i].humanProb;
-      index=i;
+      if (tracks[i].humanProb>max)
+      {
+        max=tracks[i].humanProb;
+        index=i;
+      }
     }
+  }
   return index;
 }
 

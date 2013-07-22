@@ -257,7 +257,6 @@ void Track::updateRobot(const geometry_msgs::PointStamped& pointStamped,
                         const vnl_matrix<double>& obsCovariance,
                         double maxCovar)
 {
-  cout<<"updateRobot"<<endl;
   vnl_vector<double> obs=getPoint(pointStamped);
   kalmanFilter.observation(obs,
                            obsModel,
