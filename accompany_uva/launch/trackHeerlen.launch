@@ -2,7 +2,7 @@
 
   <!-- rosbag -->
   <node pkg="rosbag" type="play" name="playBags"
-        args="--clock -d 1 -r 1 $(find accompany_uva)/res/Heerlen/2013-06-14-13-59-27.bag
+        args="--clock -d 2 -r 1 $(find accompany_uva)/res/Heerlen/2013-06-14-13-59-27.bag
         --topics 
         /camera_kitchen/camera_info 
         /camera_kitchen/image_raw/theora 

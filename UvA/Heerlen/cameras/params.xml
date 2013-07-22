@@ -30,10 +30,10 @@
     </Vector>
   </Cameras>
 
-  <personHeight>1810</personHeight>
-  <wg>460</wg>
-  <wm>610</wm>
-  <wt>270</wt>
+  <personHeight>1910</personHeight>
+  <wg>500</wg>
+  <wm>650</wm>
+  <wt>300</wt>
   <midRatio>.80</midRatio>
   <persDist>170</persDist>
   <scanres>50</scanres>

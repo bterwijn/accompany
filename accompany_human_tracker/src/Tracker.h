@@ -20,6 +20,10 @@
 class Tracker
 {
  public:
+  
+  static const double detect_human_score=0.01;
+  static const double smooth_velocity_human_score=0.02;
+
   Tracker(const ros::Publisher& trackedHumansPub,
           const ros::Publisher& markerArrayPub,
           const std::vector<WorldPoint>& priorHull,
@@ -68,7 +72,8 @@ class Tracker
   void reduceSpeed();
   void removeTracks();
   void publishTracks();
-
+  void normalizeHumanProb();
+  unsigned getMaxHumanProbIndex();
 };
 
 #endif

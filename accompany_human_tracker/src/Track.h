@@ -37,7 +37,9 @@ class Track
                    const vnl_matrix<double>& obsModel,
                    const vnl_matrix<double>& obsCovariance,
                    double maxCovar);
-  
+
+  vnl_vector<double> getPosition();
+  vnl_vector<double> getSpeed();
   
 
   void maxSpeed(double maxSpeed);
@@ -54,14 +56,14 @@ class Track
 
   unsigned matchCount; // number of times matched by observation
   unsigned unmatchedCount; // number consecutive unmatched
-  
+  double humanProb;
 
  private:
   static unsigned nextID;
   unsigned id;
   KalmanFilter<double> kalmanFilter;
   accompany_uva_msg::Appearance appearance;
-  
+
   static vnl_vector<double> getObs(const accompany_uva_msg::HumanDetection& humanDetection);
   static vnl_matrix<double> getObsCovariance(const accompany_uva_msg::HumanDetection& humanDetection);
   void updateAppearance(double weight,const accompany_uva_msg::Appearance& newAppearance);

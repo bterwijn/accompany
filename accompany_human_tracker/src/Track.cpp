@@ -47,6 +47,7 @@ Track::Track(const accompany_uva_msg::HumanDetection& humanDetection,double maxC
   id=++nextID;
   matchCount=0;
   unmatchedCount=0;
+  humanProb=0;
 }
 
 /**
@@ -254,6 +255,18 @@ void Track::updateAppearance(double weight,const accompany_uva_msg::Appearance& 
   appearance.sumTemplatePixelSize=
     appearance.sumTemplatePixelSize*weight1+
     newAppearance.sumTemplatePixelSize*weight2;
+}
+
+vnl_vector<double> Track::getPosition()
+{
+  vnl_vector<double> v(3,0);
+  return v;
+}
+
+vnl_vector<double> getSpeed()
+{
+  vnl_vector<double> v(3,0);
+  return v;
 }
 
 /**

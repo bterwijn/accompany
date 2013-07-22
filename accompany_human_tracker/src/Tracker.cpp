@@ -148,8 +148,10 @@ void Tracker::processDetections(const accompany_uva_msg::HumanDetections::ConstP
                                           obsCovariance,
                                           maxCovar);
       tracks[associations[i]].maxSpeed(maxSpeed);
+      tracks[associations[i]].humanProb+=detect_human_score;
     }
   }
+  normalizeHumanProb();
   cout<<" trackerCount: "<<trackerCount<<" assignedCount: "<<assignedCount<<endl;
   
   removeTracks();
@@ -211,6 +213,7 @@ void Tracker::tfCallBack(const tf::tfMessage& tf)
     if (tf.transforms[i].child_frame_id=="/base_link") // if robot
     {
       cout<<"-received robot position"<<endl;
+      
       if (coordFrame.size()>0) // if HumanDetections coordinate frame is known
       {
         try// transform to HumanDetections coordinate system
@@ -221,17 +224,17 @@ void Tracker::tfCallBack(const tf::tfMessage& tf)
           tfPoint.point.y=tf.transforms[i].transform.translation.y;
           tfPoint.point.z=tf.transforms[i].transform.translation.z;
           geometry_msgs::PointStamped transTFPoint;
-          /*transformListener.waitForTransform(tfPoint.header.frame_id,coordFrame,tfPoint.header.stamp,ros::Duration(.01));
-          transformListener.transformPoint(coordFrame,
-                                           tfPoint,
-                                           transTFPoint);*/ // to slow
+          //transformListener.waitForTransform(tfPoint.header.frame_id,coordFrame,tfPoint.header.stamp,ros::Duration(.01));
+          //transformListener.transformPoint(coordFrame,
+                                           //tfPoint,
+                                           //transTFPoint); // to slow
           ros::Time past=ros::Time::now()-ros::Duration(0.2); // time slightly in past to trick tf into tranforming imediately
           transformListener.transformPoint(coordFrame,
                                            past,
                                            tfPoint,
                                            tfPoint.header.frame_id,
                                            transTFPoint);
-          label(transTFPoint,"robot");
+	  label(transTFPoint,"robot");
         }
         catch (tf::TransformException e)
         {
@@ -261,7 +264,7 @@ void Tracker::label(geometry_msgs::PointStamped point,string label)
     if (tracks[i].matchCount>=minMatchCount) // only tracks with proper match count
     {
       double distance=wp.squareDistance(tracks[i].toWorldPoint());
-      if (distance<maxDistance)
+      if (distance<1 && distance<maxDistance)
       {
         maxDistance=distance;
         best=(int)(i);
@@ -331,25 +334,30 @@ void Tracker::publishTracks()
 {
   accompany_uva_msg::TrackedHumans trackedHumans;
   accompany_uva_msg::TrackedHuman trackedHuman;
+  trackedHuman.specialFlag=0;
   trackedHuman.location.header.stamp=ros::Time::now();
   trackedHuman.location.header.frame_id=coordFrame;
-  for (vector<Track>::iterator it=tracks.begin();it!=tracks.end();it++)
+  unsigned humanIndex=getMaxHumanProbIndex();
+  for (unsigned i=0;i<tracks.size();i++)
   {
-    if (it->matchCount>=minMatchCount) // only tracks with proper match count
+    if (tracks[i].matchCount>=minMatchCount) // only tracks with proper match count
     {
-      it->writeMessage(trackedHuman);
-      string name=idToName.getIDName(it->getID());
+      tracks[i].writeMessage(trackedHuman);
+      string name=idToName.getIDName(tracks[i].getID());
       if (name.compare(IDToName::unkown)!=0)
         trackedHuman.identity=name;
       else
         trackedHuman.identity="";
+      if (i==humanIndex)
+	trackedHuman.specialFlag=1;
+      else
+	trackedHuman.specialFlag=0;
       trackedHumans.trackedHumans.push_back(trackedHuman);
     }
   }
   trackedHumansPub.publish(trackedHumans);
   markerArrayPub.publish(msgToMarkerArray.toMarkerArray(trackedHumans,"trackedHumans")); // publish visualisation
 }
-
 
 /**
  * ostream a tracker
@@ -362,4 +370,27 @@ std::ostream& operator<<(std::ostream& out,const Tracker& tracker)
     out<<"["<<i<<"] "<<tracker.tracks[i];
   out<<endl;
   return out;
+}
+
+void Tracker::normalizeHumanProb()
+{
+  double sum=0;
+  for (vector<Track>::iterator it=tracks.begin();it!=tracks.end();it++)
+    sum+=it->humanProb;
+  if (sum>0)
+    for (vector<Track>::iterator it=tracks.begin();it!=tracks.end();it++)
+      it->humanProb/=sum;
+}
+
+unsigned Tracker::getMaxHumanProbIndex()
+{
+  unsigned index=0;
+  double max=0;
+  for (unsigned i=0;i<tracks.size();i++)
+    if (tracks[i].humanProb>max)
+    {
+      max=tracks[i].humanProb;
+      index=i;
+    }
+  return index;
 }

@@ -134,6 +134,8 @@ visualization_msgs::MarkerArray &MsgToMarkerArray::toMarkerArray(const accompany
     ss<<msg.trackedHumans[i].id;
     if (msg.trackedHumans[i].identity.size()>0)
       ss<<","<<msg.trackedHumans[i].identity;
+    if (msg.trackedHumans[i].specialFlag==1)
+      ss<<",H";
     markerArray.markers[ind].text=ss.str();
     markerArray.markers[ind].lifetime = ros::Duration(10);
     ind++;
