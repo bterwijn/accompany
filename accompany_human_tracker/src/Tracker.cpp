@@ -193,13 +193,14 @@ void Tracker::processDetections(const accompany_uva_msg::HumanDetections::ConstP
  */
 void Tracker::identityReceived(const cob_people_detection_msgs::DetectionArray::ConstPtr& detectionArray)
 {
-  cout<<"-received "<<detectionArray->detections.size()<<" face detections"<<endl;
+  cout<<"-face_detection received size:"<<detectionArray->detections.size()<<endl;
   if (coordFrame.size()>0) // if HumanDetections coordinate frame is known
   {
     for (unsigned i=0;i<detectionArray->detections.size();i++)
     {
       geometry_msgs::PoseStamped pose=detectionArray->detections[i].pose;
-      try// transform to HumanDetections coordinate system
+      cout<<"-face_detection pose: "<<pose.pose.position.x<<","<<pose.pose.position.y<<","<<pose.pose.position.z<<endl;
+      try // transform to HumanDetections coordinate system
       {
         geometry_msgs::PoseStamped transPose;
         transformListener.transformPose(coordFrame,
@@ -210,6 +211,7 @@ void Tracker::identityReceived(const cob_people_detection_msgs::DetectionArray::
         geometry_msgs::PointStamped transTFPoint;
         transTFPoint.header=transPose.header;
         transTFPoint.point=transPose.pose.position;
+	cout<<"-face_detection transformed: "<<transTFPoint.point.x<<","<<transTFPoint.point.y<<","<<transTFPoint.point.z<<endl;
         label(transTFPoint,detectionArray->detections[i].label);
       }
       catch (tf::TransformException e)
@@ -278,18 +280,19 @@ void Tracker::tfCallBack(const tf::tfMessage& tf)
  */
 void Tracker::label(geometry_msgs::PointStamped point,string label)
 {
-  WorldPoint wp(point.point.x,
-                point.point.y,
-                point.point.z);
-  wp*=1000.0; // from meters to millimeters
   double maxDistance=numeric_limits<double>::max();
   int best=-1;
   for (unsigned i=0;i<tracks.size();i++)
   {
     if (tracks[i].matchCount>=minMatchCount) // only tracks with proper match count
     {
-      double distance=wp.squareDistance(tracks[i].toWorldPoint());
-      if (distance<1 && distance<maxDistance)
+      vnl_vector<double> pos=tracks[i].getPosition();
+      cout<<"face_detect "<<point.point.x<<","<<point.point.y<<"  "<<pos[0]<<","<<pos[1]<<endl;
+      double dx=point.point.x-pos[0];
+      double dy=point.point.y-pos[1];
+      double distance=sqrt(dx*dx+dy*dy);
+      cout<<"face_detect distance:"<<distance<<endl;
+      if (distance<3 && distance<maxDistance)
       {
         maxDistance=distance;
         best=(int)(i);
@@ -299,7 +302,7 @@ void Tracker::label(geometry_msgs::PointStamped point,string label)
   if (best>=0)
   {
     idToName.setIDName(tracks[best].getID(),label);
-    cout<<"label track "<<tracks[best].getID()<<" '"<<label<<"'"<<endl;
+    cout<<"face_detect label track "<<tracks[best].getID()<<" '"<<label<<"'"<<endl;
   }
 }
 
