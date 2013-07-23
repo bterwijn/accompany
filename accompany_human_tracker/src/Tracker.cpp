@@ -75,6 +75,13 @@ double timeDiff(const struct timeval& time,
   return (time.tv_sec-prevTime.tv_sec)+(time.tv_usec-prevTime.tv_usec)/((double)1E6);
 }
 
+bool randomTrackCreation()
+{
+  //double r=(rand()/(double)RAND_MAX);
+  //return (r<0.03);
+  return false;
+}
+
 /**
  * Processes human detections, assign detections to known tracks or create new tracks
  * @param humanDetections the detections
@@ -131,7 +138,8 @@ void Tracker::processDetections(const accompany_uva_msg::HumanDetections::ConstP
   {
     if (associations[i]<0) // not assigned
     {
-      if (inside(toWorldPoint(humanDetections->detections[i]),entryExitHulls))
+      if (inside(toWorldPoint(humanDetections->detections[i]),entryExitHulls) ||
+          randomTrackCreation())
       {
         cout<<"unassociated detection in entryExitHulls, new track started"<<endl;
         tracks.push_back(Track(humanDetections->detections[i],maxCovar));
