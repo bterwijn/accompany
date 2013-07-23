@@ -340,14 +340,12 @@ void Tracker::removeTracks()
       }
       */
     }
-    /*
-    if (it->unmatchedCount>it->matchCount)
+    if (it->unmatchedCount>100*it->matchCount) // remove when not matched for LONG time
     {
       cout<<"remove track because unmatched="<<it->unmatchedCount<<" > matchCount"<<it->matchCount<<endl;
       tracks.erase(it);
       remove=true;
     }
-    */
     if (!remove) it++;
   }
 }
