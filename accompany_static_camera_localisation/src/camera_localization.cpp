@@ -977,7 +977,7 @@ void publishTF()
   {
     frame.header.stamp=ros::Time::now();
     transformBroadcasterPtr->sendTransform(frame);
-    usleep(50*1000); // sleep 50ms for +-20Hz thread
+    usleep(10*1000); // sleep 10ms for +-100Hz thread
   }
 }
 
