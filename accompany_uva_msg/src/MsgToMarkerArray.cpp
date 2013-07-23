@@ -64,6 +64,12 @@ visualization_msgs::MarkerArray &MsgToMarkerArray::toMarkerArray(const accompany
   int ind=0;
   // sphere
   double radius=0.2;
+  std_msgs::ColorRGBA red;
+  red.r=1;
+  red.a=0.3;
+  std_msgs::ColorRGBA blue;
+  blue.b=1;
+  blue.a=0.3;
   for (unsigned int i=0;i<msg.trackedHumans.size();i++)
   {
     markerArray.markers[ind].header.frame_id = msg.trackedHumans[i].location.header.frame_id;
@@ -79,10 +85,10 @@ visualization_msgs::MarkerArray &MsgToMarkerArray::toMarkerArray(const accompany
     markerArray.markers[ind].scale.x = radius*2;
     markerArray.markers[ind].scale.y = radius*2;
     markerArray.markers[ind].scale.z = radius*2;
-    markerArray.markers[ind].color.r = 1.0;
-    markerArray.markers[ind].color.g = 0.0;
-    markerArray.markers[ind].color.b = 0.0;
-    markerArray.markers[ind].color.a = 0.2;
+    if (msg.trackedHumans[i].specialFlag==1)
+      markerArray.markers[ind].color=blue;
+    else
+      markerArray.markers[ind].color=red;
     markerArray.markers[ind].lifetime = ros::Duration(10);
     ind++;
   }
@@ -103,10 +109,10 @@ visualization_msgs::MarkerArray &MsgToMarkerArray::toMarkerArray(const accompany
     markerArray.markers[ind].scale.x = length;
     markerArray.markers[ind].scale.y = .1;
     markerArray.markers[ind].scale.z = .1;
-    markerArray.markers[ind].color.r = 1.0;
-    markerArray.markers[ind].color.g = 0.0;
-    markerArray.markers[ind].color.b = 0.0;
-    markerArray.markers[ind].color.a = 0.2;
+    if (msg.trackedHumans[i].specialFlag==1)
+      markerArray.markers[ind].color=blue;
+    else
+      markerArray.markers[ind].color=red;
     markerArray.markers[ind].lifetime = ros::Duration(10);
     ind++;
   }
@@ -126,16 +132,14 @@ visualization_msgs::MarkerArray &MsgToMarkerArray::toMarkerArray(const accompany
     markerArray.markers[ind].scale.x = 0.2;
     markerArray.markers[ind].scale.y = 0.2;
     markerArray.markers[ind].scale.z = 0.2;
-    markerArray.markers[ind].color.r = 1.0;
-    markerArray.markers[ind].color.g = 0.0;
-    markerArray.markers[ind].color.b = 0.0;
-    markerArray.markers[ind].color.a = 0.2;
+    if (msg.trackedHumans[i].specialFlag==1)
+      markerArray.markers[ind].color=blue;
+    else
+      markerArray.markers[ind].color=red;
     stringstream ss;
     ss<<msg.trackedHumans[i].id;
     if (msg.trackedHumans[i].identity.size()>0)
       ss<<","<<msg.trackedHumans[i].identity;
-    if (msg.trackedHumans[i].specialFlag==1)
-      ss<<",H";
     markerArray.markers[ind].text=ss.str();
     markerArray.markers[ind].lifetime = ros::Duration(10);
     ind++;
