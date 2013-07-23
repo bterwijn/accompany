@@ -202,13 +202,8 @@ void Tracker::identityReceived(const cob_people_detection_msgs::DetectionArray::
       try// transform to HumanDetections coordinate system
       {
         geometry_msgs::PoseStamped transPose;
-        /*transformListener.waitForTransform(pose.header.frame_id,coordFrame,pose.header.stamp,ros::Duration(.3));
         transformListener.transformPose(coordFrame,
-                                        pose,
-                                        transPose); */ // to slow
-        ros::Time past=ros::Time::now()-ros::Duration(0.1); // time slightly in past to trick tf into tranforming imediately
-        transformListener.transformPose(coordFrame,
-                                        past,
+                                        ros::Time(0), // last know transform
                                         pose,
                                         pose.header.frame_id,
                                         transPose);
@@ -247,17 +242,11 @@ void Tracker::tfCallBack(const tf::tfMessage& tf)
           tfPoint.point.y=tf.transforms[i].transform.translation.y;
           tfPoint.point.z=tf.transforms[i].transform.translation.z;
           geometry_msgs::PointStamped transTFPoint;
-          //transformListener.waitForTransform(tfPoint.header.frame_id,coordFrame,tfPoint.header.stamp,ros::Duration(.01));
-          //transformListener.transformPoint(coordFrame,
-                                           //tfPoint,
-                                           //transTFPoint); // to slow
-          ros::Time past=ros::Time::now()-ros::Duration(0.1); // time slightly in past to trick tf into tranforming imediately
           transformListener.transformPoint(coordFrame,
-                                           past,
+                                           ros::Time(0), // last know transform
                                            tfPoint,
                                            tfPoint.header.frame_id,
                                            transTFPoint);
-	  //label(transTFPoint,"robot");
           int robotIndex=getRobotIndex();
           if (robotIndex>=0) // have robot Track
           {
