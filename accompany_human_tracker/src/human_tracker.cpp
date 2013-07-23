@@ -70,7 +70,7 @@ int main(int argc,char **argv)
   // subscribers
   ros::Subscriber humanDetectionsSub=n.subscribe<accompany_uva_msg::HumanDetections>("/humanDetections",10,
                                                                                      &Tracker::processDetections,&tracker);
-  ros::Subscriber identitySub=n.subscribe<cob_people_detection_msgs::DetectionArray>("/face_recognitions",10,
+  ros::Subscriber identitySub=n.subscribe<cob_people_detection_msgs::DetectionArray>("/cob_people_detection/detection_tracker/face_position_array",10,
                                                                                      &Tracker::identityReceived,&tracker);
   ros::Subscriber tfSub= n.subscribe("tf", 100,
                                      &Tracker::tfCallBack,&tracker);
