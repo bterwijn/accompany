@@ -158,16 +158,19 @@ void Tracker::processDetections(const accompany_uva_msg::HumanDetections::ConstP
                                           maxCovar);
       vnl_vector<double> speedAfter=tracks[associations[i]].getSpeed();
       tracks[associations[i]].maxSpeed(maxSpeed);
-      tracks[associations[i]].humanProb+=detect_human_score; // more likely a human
-      double sp=speedAfter.two_norm();
-      if (sp>0.1)
+      if (!tracks[associations[i]].isRobot())
       {
-        tracks[associations[i]].humanProb+=velocity_human_score; // even more likely a human
-        double smoothSp=(speedAfter-speedBefore).two_norm();
-        if (smoothSp<sp*0.1)
+        tracks[associations[i]].humanProb+=detect_human_score; // more likely a human
+        double sp=speedAfter.two_norm();
+        if (sp>0.1)
         {
-          tracks[associations[i]].humanProb+=smooth_velocity_human_score; // even more likely a human
-        }
+          tracks[associations[i]].humanProb+=velocity_human_score; // even more likely a human
+          double smoothSp=(speedAfter-speedBefore).two_norm();
+          if (smoothSp<sp*0.1)
+          {
+	    tracks[associations[i]].humanProb+=smooth_velocity_human_score; // even more likely a human
+	  }
+	}
       }
     }
   }
@@ -428,13 +431,10 @@ int Tracker::getMaxHumanProbIndex()
   double max=0;
   for (unsigned i=0;i<tracks.size();i++)
   {
-    if (!tracks[i].isRobot())
+    if (tracks[i].humanProb>max)
     {
-      if (tracks[i].humanProb>max)
-      {
-        max=tracks[i].humanProb;
-        index=i;
-      }
+      max=tracks[i].humanProb;
+      index=i;
     }
   }
   return index;
